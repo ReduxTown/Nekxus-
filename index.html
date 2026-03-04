@@ -3,14 +3,97 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Ace's Alt Toolkit - Safe & Client-Side</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Ace's Alt Toolkit + Webhook Tester</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: #e0e0ff;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    header {
+      text-align: center;
+      margin: 30px 0;
+      padding: 20px;
+      background: rgba(0,0,0,0.4);
+      border-radius: 12px;
+    }
+    h1 { font-family: 'Orbitron', sans-serif; color: #00ffea; margin-bottom: 10px; }
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: rgba(20, 20, 50, 0.7);
+      border: 1px solid #4444aa;
+      border-radius: 12px;
+      padding: 20px;
+      backdrop-filter: blur(6px);
+    }
+    h2 { color: #a78bfa; margin-bottom: 15px; }
+    .controls { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
+    input, select, button, textarea {
+      padding: 10px 14px;
+      border: 1px solid #5555aa;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.05);
+      color: white;
+      font-size: 1rem;
+    }
+    button {
+      background: #6a5acd;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    button:hover { background: #7b68ee; transform: translateY(-2px); }
+    .list { max-height: 220px; overflow-y: auto; margin-top: 10px; }
+    .list div {
+      background: rgba(255,255,255,0.05);
+      margin: 6px 0;
+      padding: 8px;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .password-box {
+      font-family: monospace;
+      font-size: 1.4rem;
+      background: #111133;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 15px 0;
+      word-break: break-all;
+      min-height: 60px;
+    }
+    .preview {
+      font-size: 1.8rem;
+      min-height: 60px;
+      margin: 20px 0;
+      text-align: center;
+      background: rgba(0,0,0,0.3);
+      padding: 20px;
+      border-radius: 8px;
+    }
+    .styles button { margin: 6px; padding: 10px 16px; font-size: 1.1rem; }
+    textarea { width: 100%; height: 120px; margin: 10px 0; }
+    footer { text-align: center; margin-top: 40px; color: #aaa; font-size: 0.9rem; }
+    .result { font-weight: bold; margin-top: 12px; font-size: 1.2rem; }
+    .warning { color: #ffaa00; font-weight: bold; margin: 10px 0; }
+  </style>
 </head>
 <body>
   <header>
     <h1>Ace's Alt Toolkit</h1>
-    <p>100% in-browser — nothing is saved or sent anywhere. Generate names, check Roblox availability, style display names, make strong passwords.</p>
+    <p>100% in-browser tools — usernames, passwords, Roblox checker, fancy names, local planner + your own Discord webhook tester.</p>
+    <p class="warning">Nothing is logged, saved server-side, or sent without YOUR action. Use responsibly!</p>
   </header>
 
   <main>
@@ -36,22 +119,22 @@
       <input type="text" id="checkName" placeholder="Enter username to check" maxlength="20">
       <button onclick="checkRobloxUsername()">Check Availability</button>
       <p id="checkResult" class="result"></p>
-      <small>Note: Roblox may rate-limit this — wait a bit if it fails.</small>
+      <small>Note: Roblox may rate-limit — wait if it fails.</small>
     </section>
 
     <!-- Password Generator -->
     <section class="card">
       <h2>Strong Password / Passphrase Generator</h2>
       <div class="controls">
-        <label>Length: <input type="range" id="passLength" min="8" max="32" value="16"></label>
+        <label>Length: <input type="range" id="passLength" min="8" max="32" value="16" oninput="document.getElementById('lengthValue').textContent=this.value"></label>
         <span id="lengthValue">16</span>
         <label><input type="checkbox" id="useSymbols" checked> Symbols</label>
         <label><input type="checkbox" id="useNumbers" checked> Numbers</label>
-        <label><input type="checkbox" id="usePassphrase"> Use diceware-style words (easier to remember)</label>
+        <label><input type="checkbox" id="usePassphrase"> Diceware words (easier to remember)</label>
         <button onclick="generatePassword()">Generate</button>
       </div>
       <div id="passwordDisplay" class="password-box"></div>
-      <button onclick="copyPassword()">Copy to Clipboard</button>
+      <button onclick="copyPassword()">Copy Password</button>
     </section>
 
     <!-- Display Name Styler -->
@@ -67,20 +150,218 @@
       </div>
     </section>
 
-    <!-- Alt Planner (localStorage) -->
+    <!-- Alt Planner -->
     <section class="card">
-      <h2>Alt Account Planner (saved in browser only)</h2>
-      <textarea id="plannerNotes" placeholder="Ideas, goals, skins, etc..."></textarea>
+      <h2>Alt Account Planner (browser only)</h2>
+      <textarea id="plannerNotes" placeholder="Ideas, goals, skins..."></textarea>
       <button onclick="savePlanner()">Save Notes</button>
       <button onclick="clearPlanner()">Clear</button>
       <p id="plannerStatus"></p>
     </section>
+
+    <!-- Discord Webhook Tester -->
+    <section class="card">
+      <h2>Discord Webhook Tester (Your Webhook Only)</h2>
+      <p class="warning">⚠️ NEVER share your webhook URL — anyone with it can spam your channel!<br>
+      This saves/uses ONLY what YOU enter. No auto-sends, no data to us.</p>
+      <input type="text" id="webhookUrl" placeholder="Paste your Discord webhook URL" style="width:100%; margin:10px 0;">
+      <button onclick="saveWebhook()">Save Webhook</button>
+      <button onclick="clearWebhook()">Clear Saved Webhook</button>
+      <p id="webhookStatus" style="margin:10px 0; font-weight:bold;"></p>
+      <p>Saved: <span id="maskedWebhook">None saved</span></p>
+      <button onclick="sendTestMessage()" style="background:#7289da; margin-top:15px;">Send Test Message</button>
+      <p id="testResult" class="result" style="margin-top:10px;"></p>
+    </section>
   </main>
 
   <footer>
-    <p>Built for fun — Use alts responsibly. No data leaves your device.</p>
+    <p>Built for fun in Columbus, OH • 2026 • Everything stays in your browser. Use alts responsibly.</p>
   </footer>
 
-  <script src="script.js"></script>
+  <script>
+    // Username Generator
+    const themes = {
+      cool: ["Shadow", "Nexus", "Phantom", "Rage", "Vortex", "Blaze", "Frost", "Nova", "Zero", "Rizz", "Sigma", "Omega"],
+      funny: ["Skibidi", "Ohio", "Rizzler", "Gyatt", "Fanum", "Tax", "Mog", "Brainrot", "Cooked", "Creeper", "Noob", "Pro"],
+      og: ["xX", "Xx", "_", "YT", "TV", "OG", "420", "69", "X", "Z", "K", ""],
+      anime: ["Kawaii", "Senpai", "Neko", "Chan", "Kun", "Sama", "Dark", "Yami", "Hikari", "Akuma", "Tenshi"]
+    };
+
+    function generateUsernames() {
+      const theme = document.getElementById("theme").value;
+      const count = parseInt(document.getElementById("count").value) || 10;
+      const list = document.getElementById("usernameList");
+      list.innerHTML = "";
+      for (let i = 0; i < count; i++) {
+        const adj = themes[theme][Math.floor(Math.random() * themes[theme].length)];
+        const noun = themes[theme][Math.floor(Math.random() * themes[theme].length)];
+        const num = Math.random() > 0.6 ? Math.floor(Math.random() * 100) : "";
+        const name = adj + noun + num;
+        const div = document.createElement("div");
+        div.innerHTML = `<span>${name}</span><button onclick="navigator.clipboard.writeText('${name}')">Copy</button>`;
+        list.appendChild(div);
+      }
+    }
+
+    // Roblox Checker
+    async function checkRobloxUsername() {
+      const name = document.getElementById("checkName").value.trim();
+      const result = document.getElementById("checkResult");
+      if (!name || name.length < 3) { result.textContent = "Enter 3+ chars"; result.style.color = "orange"; return; }
+      result.textContent = "Checking..."; result.style.color = "white";
+      try {
+        const res = await fetch(`https://auth.roblox.com/v2/usernames/users?username=${encodeURIComponent(name)}`);
+        const data = await res.json();
+        if (data.code === 0 && data.data?.length > 0) {
+          result.textContent = "❌ Taken"; result.style.color = "#ff5555";
+        } else if (data.code === 10) {
+          result.textContent = "✅ Available!"; result.style.color = "#55ff55";
+        } else {
+          result.textContent = "⚠️ " + (data.message || "Unknown"); result.style.color = "orange";
+        }
+      } catch {
+        result.textContent = "Error (rate-limit?) Try later."; result.style.color = "orange";
+      }
+    }
+
+    // Password Generator
+    function generatePassword() {
+      const len = parseInt(document.getElementById("passLength").value);
+      const sym = document.getElementById("useSymbols").checked;
+      const num = document.getElementById("useNumbers").checked;
+      const phrase = document.getElementById("usePassphrase").checked;
+      let chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      if (num) chars += "0123456789";
+      if (sym) chars += "!@#$%^&*()_+-=[]{}|;:,.<>?";
+      let pass = "";
+      if (phrase) {
+        const words = ["apple","banana","cat","dog","elephant","fox","guitar","house","ice","joker","kite","lemon"];
+        for (let i = 0; i < Math.max(3, Math.floor(len / 6)); i++) {
+          pass += words[Math.floor(Math.random() * words.length)] + (Math.random() > 0.5 ? "-" : "");
+        }
+        pass = pass.slice(0, len);
+      } else {
+        for (let i = 0; i < len; i++) pass += chars[Math.floor(Math.random() * chars.length)];
+      }
+      document.getElementById("passwordDisplay").textContent = pass;
+      window.lastPass = pass;
+    }
+    function copyPassword() {
+      if (window.lastPass) {
+        navigator.clipboard.writeText(window.lastPass);
+        alert("Copied!");
+      }
+    }
+
+    // Fancy Styler
+    const styleMaps = {
+      bold: s => s.split('').map(c => {
+        const code = c.charCodeAt(0);
+        if (code >= 65 && code <= 90) return String.fromCharCode(0x1D400 + code - 65);
+        if (code >= 97 && code <= 122) return String.fromCharCode(0x1D41A + code - 97);
+        return c;
+      }).join(''),
+      italic: s => s.split('').map(c => {
+        const code = c.charCodeAt(0);
+        if (code >= 65 && code <= 90) return String.fromCharCode(0x1D434 + code - 65);
+        if (code >= 97 && code <= 122) return String.fromCharCode(0x1D44E + code - 97);
+        return c;
+      }).join(''),
+      small: s => s.toUpperCase().split('').map(c => {
+        const map = "🄰🄱🄲🄳🄴🄵🄶🄷🄸🄹🄺🄻🄼🄽🄾🄿🅀🅁🅂🅃🅄🅅🅆🅇🅈🅉";
+        const i = c.charCodeAt(0) - 65;
+        return (i >= 0 && i < 26) ? map[i] : c;
+      }).join(''),
+      circle: s => s.toLowerCase().split('').map(c => {
+        const map = "ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩ";
+        const i = c.charCodeAt(0) - 97;
+        return (i >= 0 && i < 26) ? map[i] : c;
+      }).join('')
+    };
+    function styleDisplayName() {
+      document.getElementById("styledPreview").textContent = document.getElementById("styleInput").value;
+    }
+    function applyStyle(type) {
+      const txt = document.getElementById("styleInput").value;
+      if (!txt) return;
+      const styled = styleMaps[type](txt);
+      document.getElementById("styledPreview").textContent = styled;
+      navigator.clipboard.writeText(styled);
+    }
+
+    // Local Planner
+    function savePlanner() {
+      const notes = document.getElementById("plannerNotes").value;
+      localStorage.setItem("altPlanner", notes);
+      document.getElementById("plannerStatus").textContent = "Saved in browser!";
+    }
+    function clearPlanner() {
+      localStorage.removeItem("altPlanner");
+      document.getElementById("plannerNotes").value = "";
+      document.getElementById("plannerStatus").textContent = "Cleared.";
+    }
+
+    // Webhook Tester
+    function saveWebhook() {
+      const url = document.getElementById("webhookUrl").value.trim();
+      if (!url || !url.startsWith("https://discord.com/api/webhooks/")) {
+        document.getElementById("webhookStatus").textContent = "Invalid webhook URL!";
+        document.getElementById("webhookStatus").style.color = "#ff5555";
+        return;
+      }
+      localStorage.setItem("userWebhook", url);
+      updateMasked();
+      document.getElementById("webhookStatus").textContent = "Saved (browser only)!";
+      document.getElementById("webhookStatus").style.color = "#55ff55";
+      document.getElementById("webhookUrl").value = "";
+    }
+    function clearWebhook() {
+      localStorage.removeItem("userWebhook");
+      updateMasked();
+      document.getElementById("webhookStatus").textContent = "Cleared.";
+      document.getElementById("webhookStatus").style.color = "orange";
+    }
+    function updateMasked() {
+      const saved = localStorage.getItem("userWebhook");
+      document.getElementById("maskedWebhook").textContent = saved ? saved.slice(0,40) + "..." : "None saved";
+    }
+    async function sendTestMessage() {
+      const webhook = localStorage.getItem("userWebhook");
+      const resEl = document.getElementById("testResult");
+      if (!webhook) {
+        resEl.textContent = "No webhook saved!"; resEl.style.color = "orange"; return;
+      }
+      resEl.textContent = "Sending..."; resEl.style.color = "white";
+      const payload = {
+        embeds: [{
+          title: "Test from Ace's Toolkit",
+          description: "Webhook works! Sent: " + new Date().toLocaleString(),
+          color: 0x7289da,
+          footer: { text: "Client-side test • No logging" }
+        }]
+      };
+      try {
+        const resp = await fetch(webhook, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        if (resp.ok) {
+          resEl.textContent = "✅ Sent! Check your Discord."; resEl.style.color = "#55ff55";
+        } else {
+          resEl.textContent = "❌ Failed: " + resp.status; resEl.style.color = "#ff5555";
+        }
+      } catch (e) {
+        resEl.textContent = "Error: " + e.message; resEl.style.color = "#ff5555";
+      }
+    }
+
+    // Init
+    window.onload = () => {
+      const savedNotes = localStorage.getItem("altPlanner");
+      if (savedNotes) document.getElementById("plannerNotes").value = savedNotes;
+      updateMasked();
+    };
+  </script>
 </body>
 </html>
