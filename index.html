@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ace's Alt Toolkit - Safe & Client-Side</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <h1>Ace's Alt Toolkit</h1>
+    <p>100% in-browser — nothing is saved or sent anywhere. Generate names, check Roblox availability, style display names, make strong passwords.</p>
+  </header>
+
+  <main>
+    <!-- Username Generator -->
+    <section class="card">
+      <h2>Username Ideas</h2>
+      <div class="controls">
+        <select id="theme">
+          <option value="cool">Cool/Sweaty</option>
+          <option value="funny">Funny/Meme</option>
+          <option value="og">Short OG-style</option>
+          <option value="anime">Anime Vibes</option>
+        </select>
+        <input type="number" id="count" value="10" min="5" max="50" placeholder="How many?">
+        <button onclick="generateUsernames()">Generate</button>
+      </div>
+      <div id="usernameList" class="list"></div>
+    </section>
+
+    <!-- Roblox Checker -->
+    <section class="card">
+      <h2>Roblox Username Checker</h2>
+      <input type="text" id="checkName" placeholder="Enter username to check" maxlength="20">
+      <button onclick="checkRobloxUsername()">Check Availability</button>
+      <p id="checkResult" class="result"></p>
+      <small>Note: Roblox may rate-limit this — wait a bit if it fails.</small>
+    </section>
+
+    <!-- Password Generator -->
+    <section class="card">
+      <h2>Strong Password / Passphrase Generator</h2>
+      <div class="controls">
+        <label>Length: <input type="range" id="passLength" min="8" max="32" value="16"></label>
+        <span id="lengthValue">16</span>
+        <label><input type="checkbox" id="useSymbols" checked> Symbols</label>
+        <label><input type="checkbox" id="useNumbers" checked> Numbers</label>
+        <label><input type="checkbox" id="usePassphrase"> Use diceware-style words (easier to remember)</label>
+        <button onclick="generatePassword()">Generate</button>
+      </div>
+      <div id="passwordDisplay" class="password-box"></div>
+      <button onclick="copyPassword()">Copy to Clipboard</button>
+    </section>
+
+    <!-- Display Name Styler -->
+    <section class="card">
+      <h2>Fancy Display Name Styler</h2>
+      <input type="text" id="styleInput" placeholder="Type text here..." oninput="styleDisplayName()">
+      <div id="styledPreview" class="preview"></div>
+      <div class="styles">
+        <button onclick="applyStyle('bold')">𝐁𝐨𝐥𝐝</button>
+        <button onclick="applyStyle('italic')">𝑰𝒕𝒂𝒍𝒊𝒄</button>
+        <button onclick="applyStyle('small')">🄰🄻🄻 🅂🄼🄰🄻🄻</button>
+        <button onclick="applyStyle('circle')">ⓒⓘⓡⓒⓛⓔ</button>
+      </div>
+    </section>
+
+    <!-- Alt Planner (localStorage) -->
+    <section class="card">
+      <h2>Alt Account Planner (saved in browser only)</h2>
+      <textarea id="plannerNotes" placeholder="Ideas, goals, skins, etc..."></textarea>
+      <button onclick="savePlanner()">Save Notes</button>
+      <button onclick="clearPlanner()">Clear</button>
+      <p id="plannerStatus"></p>
+    </section>
+  </main>
+
+  <footer>
+    <p>Built for fun — Use alts responsibly. No data leaves your device.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
