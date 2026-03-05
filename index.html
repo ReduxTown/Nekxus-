@@ -14,8 +14,6 @@
       min-height: 100vh;
       overflow-x: hidden;
     }
-
-    /* Cutscene Overlay */
     #cutscene {
       position: fixed;
       inset: 0;
@@ -26,7 +24,6 @@
       justify-content: center;
       opacity: 1;
       transition: opacity 1.5s ease-out;
-      pointer-events: none;
     }
     #cutscene.hidden { opacity: 0; pointer-events: none; }
     #introText {
@@ -40,18 +37,16 @@
       animation: nexusReveal 3s forwards 0.5s;
     }
     @keyframes nexusReveal {
-      0%   { opacity: 0; transform: scale(0.8); text-shadow: 0 0 0 #00ffea; }
+      0%   { opacity: 0; transform: scale(0.8); }
       40%  { opacity: 1; transform: scale(1.05); text-shadow: 0 0 60px #00ffea; }
-      70%  { transform: scale(0.98); }
       100% { opacity: 1; transform: scale(1); text-shadow: 0 0 30px #00ffea; }
     }
-
     header {
       text-align: center;
       padding: 30px 20px;
       background: rgba(0,0,0,0.5);
     }
-    h1 { font-family: 'Orbitron', sans-serif; color: #00ffea; font-size: 3.5rem; margin-bottom: 10px; }
+    h1 { font-family: 'Orbitron', sans-serif; color: #00ffea; font-size: 3.5rem; }
     main {
       max-width: 1200px;
       margin: 0 auto;
@@ -66,10 +61,10 @@
       border-radius: 16px;
       padding: 24px;
       backdrop-filter: blur(10px);
-      transition: transform 0.3s, box-shadow 0.3s;
+      transition: transform 0.3s;
     }
-    .card:hover { transform: translateY(-8px); box-shadow: 0 12px 30px rgba(0,255,234,0.2); }
-    h2 { color: #a78bfa; margin-bottom: 16px; font-size: 1.8rem; }
+    .card:hover { transform: translateY(-8px); }
+    h2 { color: #a78bfa; margin-bottom: 16px; }
     input, select, button, textarea {
       padding: 12px 16px;
       border: 1px solid #5555aa;
@@ -85,35 +80,32 @@
       transition: all 0.25s;
     }
     button:hover { background: #7b68ee; transform: scale(1.05); }
-    .avatar-preview {
-      margin-top: 16px;
-      text-align: center;
-    }
     .avatar-preview img {
       max-width: 100%;
       border-radius: 12px;
       border: 3px solid #00ffea;
       box-shadow: 0 0 20px rgba(0,255,234,0.4);
+      transition: all 0.8s;
       opacity: 0;
       transform: translateY(20px);
-      transition: all 0.8s ease-out;
     }
     .avatar-preview img.loaded { opacity: 1; transform: translateY(0); }
     .warning { color: #ffaa00; font-weight: bold; margin: 12px 0; }
     .result { font-weight: bold; margin-top: 12px; min-height: 1.5em; }
-    footer { text-align: center; padding: 40px 20px; color: #aaa; font-size: 0.95rem; }
+    .embed-preview { background: #2f3136; border-radius: 8px; padding: 12px; margin: 12px 0; border-left: 4px solid #7289da; }
+    footer { text-align: center; padding: 40px 20px; color: #aaa; }
   </style>
 </head>
 <body>
 
-  <!-- Smooth Cutscene Intro -->
+  <!-- NEXUS Cutscene -->
   <div id="cutscene">
     <div id="introText">NEXUS</div>
   </div>
 
   <header>
     <h1>NEXUS</h1>
-    <p>Ace's Advanced Alt Toolkit • 100% Client-Side • Columbus, OH 2026</p>
+    <p>Ace's Alt Toolkit • Client-Side Only • Columbus, OH</p>
   </header>
 
   <main>
@@ -121,37 +113,53 @@
     <!-- Roblox Avatar Preview -->
     <section class="card">
       <h2>Roblox Avatar Preview</h2>
-      <p class="warning">Enter username to see 420x420 full-body thumbnail (public only).</p>
+      <p class="warning">Public 420x420 full-body thumbnail (may show pending for some users).</p>
       <div style="display:flex; gap:12px; flex-wrap:wrap;">
-        <input type="text" id="avatarUser" placeholder="Username (e.g. Kwfobb)" style="flex:1;">
-        <button onclick="loadAvatarPreview()">Load Preview</button>
+        <input type="text" id="avatarUser" placeholder="Username (e.g. Roblox)" style="flex:1;">
+        <button onclick="loadAvatarPreview()">Load</button>
       </div>
       <div class="avatar-preview" id="avatarContainer">
-        <p id="avatarStatus" class="result">Enter a username above</p>
-        <img id="avatarImg" alt="Roblox Avatar Preview" style="display:none;">
+        <p id="avatarStatus" class="result">Enter username</p>
+        <img id="avatarImg" alt="Avatar" style="display:none;">
       </div>
     </section>
 
-    <!-- Existing sections (shortened for brevity; add your full previous tools here) -->
+    <!-- Discord Webhook Sender with Password Gate -->
     <section class="card">
-      <h2>Username Ideas</h2>
-      <!-- Your generateUsernames() UI here -->
+      <h2>Discord Message Sender (Your Webhook Only)</h2>
+      <p class="warning">⚠️ NEVER share webhook URL! Protected by password "NEX88&" — enter it to send.</p>
+      <input type="text" id="webhookUrl" placeholder="Paste your webhook URL">
+      <button onclick="saveWebhook()">Save Webhook</button>
+      <p>Saved: <span id="maskedWebhook">None</span></p>
+      <p id="webhookStatus" class="result"></p>
+
+      <input type="text" id="msgContent" placeholder="Message text (optional)">
+      <input type="text" id="embedTitle" placeholder="Embed Title">
+      <textarea id="embedDesc" placeholder="Embed Description"></textarea>
+      <input type="color" id="embedColor" value="#7289da">
+      <button onclick="sendProtectedMessage()">Send Message</button>
+      <p id="sendStatus" class="result"></p>
+      <div id="embedPreview" class="embed-preview">Preview updates on input...</div>
     </section>
 
-    <!-- Add your other cards: checker, password, styler, planner, webhook etc. -->
+    <!-- Placeholder for your other tools -->
+    <section class="card">
+      <h2>Other Tools (Add your username gen, password gen, checker, etc. here)</h2>
+      <p>Expand with generateUsernames(), generatePassword(), etc. functions.</p>
+    </section>
 
   </main>
 
   <footer>
-    <p>Everything stays in-browser • Use responsibly • Built for fun</p>
+    <p>100% in-browser • Nothing sent without your action • Use responsibly</p>
   </footer>
 
   <script>
-    // Cutscene: Fade out after animation
+    // Cutscene fade-out
     window.addEventListener('load', () => {
       setTimeout(() => {
         document.getElementById('cutscene').classList.add('hidden');
-      }, 4500); // 4.5s total (0.5s delay + 3s anim + buffer)
+      }, 4500);
     });
 
     // Roblox Avatar Preview
@@ -159,54 +167,112 @@
       const username = document.getElementById('avatarUser').value.trim();
       const status = document.getElementById('avatarStatus');
       const img = document.getElementById('avatarImg');
-      const container = document.getElementById('avatarContainer');
+      if (!username) { status.textContent = "Enter username!"; status.style.color = "orange"; return; }
 
-      if (!username) {
-        status.textContent = "Enter a username!";
-        status.style.color = "orange";
-        return;
-      }
-
-      status.textContent = "Resolving username...";
-      status.style.color = "white";
-      img.style.display = "none";
+      status.textContent = "Resolving..."; status.style.color = "white"; img.style.display = "none";
 
       try {
-        // Step 1: Username → UserID (via users API)
-        const userRes = await fetch(`https://users.roblox.com/v1/usernames/users`, {
+        const userRes = await fetch('https://users.roblox.com/v1/usernames/users', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ usernames: [username], excludeBannedUsers: true })
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({usernames: [username], excludeBannedUsers: true})
         });
         const userData = await userRes.json();
-
         if (!userData.data?.length) throw new Error("User not found");
-
         const userId = userData.data[0].id;
 
-        // Step 2: Get thumbnail
         const thumbUrl = `https://thumbnails.roblox.com/v1/users/avatar?userIds=${userId}&size=420x420&format=Png&isCircular=false`;
         const thumbRes = await fetch(thumbUrl);
         const thumbData = await thumbRes.json();
 
         if (thumbData.data?.[0]?.state !== "Completed" || !thumbData.data?.[0]?.imageUrl) {
-          throw new Error("Thumbnail not ready or unavailable");
+          throw new Error("Thumbnail pending/unavailable");
         }
 
         img.src = thumbData.data[0].imageUrl;
-        img.onload = () => {
-          img.classList.add('loaded');
-          img.style.display = "block";
-        };
-        status.textContent = `Preview for ${username} (ID: ${userId})`;
+        img.onload = () => { img.classList.add('loaded'); img.style.display = "block"; };
+        status.textContent = `Loaded for ${username} (ID: ${userId})`;
         status.style.color = "#55ff55";
       } catch (err) {
-        status.textContent = "Error: " + err.message + " (try again or check username)";
+        status.textContent = "Error: " + err.message;
         status.style.color = "#ff5555";
       }
     }
 
-    // Add your other functions here (generateUsernames, checkRobloxUsername, etc.)
+    // Webhook Save / Mask
+    function saveWebhook() {
+      const url = document.getElementById("webhookUrl").value.trim();
+      if (!url.startsWith("https://discord.com/api/webhooks/")) {
+        document.getElementById("webhookStatus").textContent = "Invalid webhook URL!";
+        document.getElementById("webhookStatus").style.color = "#ff5555";
+        return;
+      }
+      localStorage.setItem("userWebhook", url);
+      document.getElementById("maskedWebhook").textContent = url.slice(0,50) + "...";
+      document.getElementById("webhookStatus").textContent = "Saved (browser only)!";
+      document.getElementById("webhookStatus").style.color = "#55ff55";
+    }
+
+    // Protected Send (Password + Webhook)
+    async function sendProtectedMessage() {
+      const pass = prompt("Enter owner password to send:");
+      if (pass !== "NEX88&") {
+        alert("Wrong password! Access denied.");
+        return;
+      }
+
+      const webhook = localStorage.getItem("userWebhook");
+      const status = document.getElementById("sendStatus");
+      if (!webhook) { status.textContent = "No webhook saved!"; status.style.color = "orange"; return; }
+
+      const content = document.getElementById("msgContent").value.trim();
+      const title = document.getElementById("embedTitle").value.trim();
+      const desc = document.getElementById("embedDesc").value.trim();
+      const colorHex = document.getElementById("embedColor").value;
+      const color = parseInt(colorHex.replace('#',''), 16);
+
+      const payload = {
+        content: content || null,
+        embeds: (title || desc) ? [{
+          title: title || null,
+          description: desc || null,
+          color: color || 0x7289da,
+          footer: { text: `NEXUS • ${new Date().toLocaleString()}` }
+        }] : undefined
+      };
+
+      status.textContent = "Sending..."; status.style.color = "white";
+
+      try {
+        const res = await fetch(webhook, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        status.textContent = res.ok ? "✅ Sent successfully!" : `❌ Failed (${res.status})`;
+        status.style.color = res.ok ? "#55ff55" : "#ff5555";
+      } catch (e) {
+        status.textContent = "Error: " + e.message;
+        status.style.color = "#ff5555";
+      }
+    }
+
+    // Optional: Live embed preview (basic)
+    function updateEmbedPreview() {
+      const title = document.getElementById("embedTitle").value.trim();
+      const desc = document.getElementById("embedDesc").value.trim();
+      const prev = document.getElementById("embedPreview");
+      prev.innerHTML = title ? `<strong>${title}</strong><br>${desc || 'Description here...'}` : "Embed preview appears here";
+    }
+    document.getElementById("embedTitle").oninput = updateEmbedPreview;
+    document.getElementById("embedDesc").oninput = updateEmbedPreview;
+    updateEmbedPreview();
+
+    // Load saved webhook on start
+    window.onload = () => {
+      const wb = localStorage.getItem("userWebhook");
+      if (wb) document.getElementById("maskedWebhook").textContent = wb.slice(0,50) + "...";
+    };
   </script>
 </body>
 </html>
